@@ -32,17 +32,18 @@ class Factoids(Cog):
 
         if admin := self.bot.get_cog('Admin'):
             admin.add_help_section(
-                'Factoids',
+                'entries',
                 [
-                    ('.add <name> <message>', 'Add new factoid'),
-                    ('.del <name>', 'Delete factoid'),
-                    ('.mod <name> <new message>', 'Modify existing factoid ("" to clear)'),
-                    ('.ren <name> <new name>', 'Rename existing factoid or alias'),
-                    ('.addalias <alias> <name>', 'Add alias to factoid'),
-                    ('.delalias <alias>', 'Rename existing factoid'),
+                    ('.add <name> <message>', 'Add new entry'),
+                    ('.del <name>', 'Delete entry'),
+                    ('.mod <name> <new message>', 'Modify existing entry ("" to clear)'),
+                    ('.ren <name> <new name>', 'Rename existing entry or alias'),
+                    ('.addalias <alias> <name>', 'Add alias to entry'),
+                    ('.delalias <alias>', 'Rename existing entry'),
                     ('.setembed <name> [y/n]', 'Set/toggle embed status'),
+                    ('.setsaund <name> [y/n]', 'Set/toggle saund status'),
                     ('.setimgurl <name> [url]', 'set image url (empty to clear)'),
-                    ('.info <name>', 'Print factoid info'),
+                    ('.info <name>', 'Print entry info'),
                     ('.top', 'Print most used commands'),
                     ('.bottom', 'Print least used commands'),
                     ('.unused', 'Print unused commands'),
@@ -70,6 +71,7 @@ class Factoids(Cog):
                 message=record['message'],
                 image_url=record['image_url'],
                 aliases=record['aliases'],
+                is_saund=record['is_saund']
             )
             self.factoids[name] = factoid
             for alias in record['aliases']:
@@ -145,7 +147,7 @@ class Factoids(Cog):
             return await ctx.send(content=message, embed=embed)
 
     @Cog.listener()
-    async def on_filtered_message(self, msg: Message):
+    async def on_message(self, msg: Message):
         if not msg.content or len(msg.content) < 2 or msg.content[0] != '!':
             return
         msg_parts = msg.content[1:].split()
@@ -209,6 +211,73 @@ class Factoids(Cog):
         )
 
     @command()
+    async def output_commands(self, ctx: Context):
+        logger.info(f'{ctx.author.id} attempting to output commands')
+        if (ctx.author.id != 652014206845190175):
+            return
+        f = open("../commandsgit/yamyamyamyamyam.github.io/index.html", "w")
+        f.write(f"<!DOCTYPE html>")
+        f.write(f'<html lang="en" dir="ltr"><body>')
+        longstring = '''<head>
+		<title>shitposte bot</title>
+		<meta charset="utf-8">
+		<style>
+			html {
+				font-family: arial, sans-serif;
+			}
+
+			#filter {
+				border: 1px solid #dddddd;
+				padding: 16px;
+				margin-bottom: 8px;
+				box-sizing: border-box;
+				width: 100%;
+				font-size: 12pt;
+			}
+
+			table {
+				border-collapse: collapse;
+				width: 80%;
+			}
+
+			th {
+				cursor: pointer;
+			}
+
+			td, th {
+				border: 1px solid #dddddd;
+				text-align: left;
+				padding: 8px;
+                max-width: 300px;
+			}
+
+			tr:nth-child(even) {
+				background-color: #eeeeee;
+			}
+			
+			img {
+				max-width: 100%;
+			}
+		</style>
+	</head>'''
+        f.write(longstring)
+        f.write(f"<table>")
+        f.write(f"<tr><td><b>Name</b></td><td><b>Uses</b></td><td><b>Embeds</b></td><td><b>Message</b></td><td><b>Image URL</b></td><td><b>Aliases</b></td><td><b>Saund mode?</b></td>")
+        for entry in self.factoids:
+            f.write(f"<tr>")
+            factoid = self.factoids[entry]
+            for key in factoid:
+                #logger.info(f'{key}')
+                f.write(f"<td>{factoid[key]}</td>")
+            f.write(f"</tr>")
+        f.write(f"</body>")
+        f.write(f"</html>")
+        f.close()
+        return await ctx.send(f'Commands have been output to file')
+
+
+
+    @command()
     async def add(self, ctx: Context, name: str.lower, *, message):
         if not self.bot.is_admin(ctx.author):
             return
@@ -219,7 +288,7 @@ class Factoids(Cog):
             f'''INSERT INTO "{self.config["db_table"]}" (name, message) VALUES ($1, $2)''', name, message
         )
         await self.fetch_factoids(refresh=True)
-        return await ctx.send(f'Factoid "{name}" has been added.')
+        return await ctx.send(f'Entry "{name}" has been added.')
 
     @command()
     async def mod(self, ctx: Context, name: str.lower, *, message):
@@ -236,7 +305,7 @@ class Factoids(Cog):
         await self.bot.db.exec(f'''UPDATE "{self.config["db_table"]}" SET message=$2 WHERE name=$1''', _name, message)
 
         await self.fetch_factoids(refresh=True)
-        return await ctx.send(f'Factoid "{name}" has been updated.')
+        return await ctx.send(f'Entry "{name}" has been updated.')
 
     @command(name='del')
     async def _del(self, ctx: Context, name: str.lower):
@@ -249,7 +318,7 @@ class Factoids(Cog):
 
         await self.bot.db.exec(f'''DELETE FROM "{self.config["db_table"]}" WHERE name=$1''', name)
         await self.fetch_factoids(refresh=True)
-        return await ctx.send(f'Factoid "{name}" has been deleted.')
+        return await ctx.send(f'Entry "{name}" has been deleted.')
 
     @command()
     async def ren(self, ctx: Context, name: str.lower, new_name: str.lower):
@@ -258,7 +327,7 @@ class Factoids(Cog):
         if name not in self.factoids and name not in self.alias_map:
             return await ctx.send(f'The specified name ("{name}") does not exist!')
         if new_name in self.factoids or new_name in self.alias_map:
-            return await ctx.send(f'The specified new name ("{name}") already exist as factoid or alias!')
+            return await ctx.send(f'The specified new name ("{name}") already exist as entry or alias!')
 
         # if name is an alias, rename the alias instead
         if name in self.alias_map:
@@ -342,6 +411,29 @@ class Factoids(Cog):
 
         await self.fetch_factoids(refresh=True)
         return await ctx.send(f'Embed mode for "{name}" set to {str(embed_status).lower()}')
+
+    @command()
+    async def setsaund(self, ctx: Context, name: str.lower, yesno: bool = None):
+        if not self.bot.is_admin(ctx.author):
+            return
+        _name = name if name in self.factoids else self.alias_map.get(name)
+        if not _name or _name not in self.factoids:
+            return await ctx.send(f'The specified factoid ("{name}") does not exist!')
+
+        factoid = self.factoids[_name]
+        saund_status = factoid['is_saund']
+
+        if yesno is None:
+            saund_status = not saund_status
+        else:
+            saund_status = yesno
+
+        await self.bot.db.exec(
+            f'''UPDATE "{self.config["db_table"]}" SET is_saund=$2 WHERE name=$1''', _name, saund_status
+        )
+
+        await self.fetch_factoids(refresh=True)
+        return await ctx.send(f'Saund mode for "{name}" set to {str(saund_status).lower()}')
 
     @command()
     async def setimgurl(self, ctx: Context, name: str.lower, url: str = None):

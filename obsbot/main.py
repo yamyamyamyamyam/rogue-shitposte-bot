@@ -116,10 +116,10 @@ class OBSBot(commands.Bot):
 
     async def on_command_error(self, context, exception):
         """Swallow some errors we don't care about"""
-        if isinstance(exception, commands.errors.CommandNotFound):
-            return
-        elif isinstance(exception, commands.errors.MissingRequiredArgument):
-            return
+        #if isinstance(exception, commands.errors.CommandNotFound):
+            # return
+        #elif isinstance(exception, commands.errors.MissingRequiredArgument):
+            # return
         raise exception
 
     async def on_message(self, message):
@@ -134,6 +134,7 @@ class OBSBot(commands.Bot):
                 'DMs are not monitored, please use the support channels in discord.gg/obsproject instead.'
             )
         else:
+            #logger.info(f'passing message to process_commands')
             await self.process_commands(message)
 
     async def close(self):
