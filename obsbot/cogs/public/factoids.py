@@ -215,7 +215,7 @@ class Factoids(Cog):
         logger.info(f'{ctx.author.id} attempting to output commands')
         if (ctx.author.id != 652014206845190175):
             return
-        f = open("../commandsgit/yamyamyamyamyam.github.io/index.html", "w")
+        f = open("../../commandsgit/yamyamyamyamyam.github.io/index.html", "w")
         f.write(f"<!DOCTYPE html>")
         f.write(f'<html lang="en" dir="ltr"><body>')
         longstring = '''<head>

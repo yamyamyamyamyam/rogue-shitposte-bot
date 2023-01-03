@@ -127,6 +127,7 @@ dmypy.json
 
 # things
 nohup.out
+data/config.example.toml
 
 # Pyre type checker
 .pyre/
