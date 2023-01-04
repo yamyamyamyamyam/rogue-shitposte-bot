@@ -1,4 +1,5 @@
 import logging
+import random
 
 from disnake import Message, Embed, Member, ApplicationCommandInteraction
 from disnake.ext.commands import Cog, command, Context, InvokableSlashCommand
@@ -153,6 +154,12 @@ class Factoids(Cog):
         msg_parts = msg.content[1:].split()
 
         factoid_name = msg_parts[0].lower()
+        if factoid_name == 'randomsaund':
+            saunds = []
+            for factoid in self.factoids:
+                if self.factoids[factoid]["is_saund"] == True or 'saund' in self.factoids[factoid]['name']:
+                    saunds.append(self.factoids[factoid]['name'])
+            factoid_name = random.choice(saunds)
 
         if factoid_name not in self.factoids:
             if factoid_name in self.alias_map:
@@ -209,6 +216,7 @@ class Factoids(Cog):
         return await self.bot.db.add_task(
             f'''UPDATE "{self.config["db_table"]}" SET uses=uses+1 WHERE name=$1''', factoid_name
         )
+
 
     @command()
     async def output_commands(self, ctx: Context):
