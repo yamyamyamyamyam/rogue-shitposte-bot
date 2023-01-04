@@ -11,6 +11,26 @@ logger = logging.getLogger(__name__)
 
 class Factoids(Cog):
     _factoids_colour = 0x36393E
+    tinystring = '''IM DELETING YOU, TINY!⚡️😭👋
+
+██]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] 10% complete.....
+
+████]]]]]]]]]]]]]]]]]]]]]]]]]]] 35% complete....
+
+███████]]]]]]]]]]]]]]]] 60% complete....
+
+███████████] 99% complete.....
+
+🚫 ERROR! 🚫
+
+💯True💯 ✔️⚡️🏈🐐Tiny🐐🏈⚡️is irreplaceable 💖
+
+I could never delete you Tiny!💖
+
+Send this to ten other 🏈🐐⚡️Tiny lovers⚡️🐐🏈 who will never trade Tiny 🔕👎🔕
+
+Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden 
+🌹💦🌷🎋💐💦🌹🌷🎋💦💐 will be in full bloom!!'''
 
     def __init__(self, bot, config):
         self.bot = bot
@@ -317,6 +337,8 @@ class Factoids(Cog):
 
     @command(name='del')
     async def _del(self, ctx: Context, name: str.lower):
+        if name == 'tiny':
+            return await ctx.send(f'{self.tinystring}')
         if not self.bot.is_admin(ctx.author):
             return
         if name not in self.factoids:
