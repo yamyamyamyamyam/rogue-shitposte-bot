@@ -174,7 +174,7 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
         msg_parts = msg.content[1:].split()
 
         factoid_name = msg_parts[0].lower()
-        if factoid_name == 'randomsaund':
+        if factoid_name == 'randomsaund' or factoid_name == 'saundrandom':
             saunds = []
             for factoid in self.factoids:
                 if self.factoids[factoid]["is_saund"] == True or 'saund' in self.factoids[factoid]['name']:
