@@ -5,6 +5,7 @@ from disnake import Message, Embed, Member, ApplicationCommandInteraction
 from disnake.ext.commands import Cog, command, Context, InvokableSlashCommand
 
 from .utils.ratelimit import RateLimiter
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,8 @@ Send this to ten other 🏈🐐⚡️Tiny lovers⚡️🐐🏈 who will never tr
 
 Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden 
 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 will be in full bloom!!'''
+    ciechbuffer = ""
+    timesincelastciech = datetime.now()
 
     def __init__(self, bot, config):
         self.bot = bot
@@ -169,6 +172,10 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
 
     @Cog.listener()
     async def on_message(self, msg: Message):
+        if msg.author.id == 334845971332595722 and msg.content.len <= 75:
+            await msg.delete(delay=0.0)
+            self.ciechbuffer += msg.content + "\n"
+
         if not msg.content or len(msg.content) < 2 or msg.content[0] != '!':
             return
         msg_parts = msg.content[1:].split()
@@ -180,6 +187,13 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
                 if self.factoids[factoid]["is_saund"] == True or 'saund' in self.factoids[factoid]['name']:
                     saunds.append(self.factoids[factoid]['name'])
             factoid_name = random.choice(saunds)
+
+        timesincelastciech = datetime.now() - self.lastciechdump
+
+        if timesincelastciech.seconds >= 30 and self.ciechbuffer != "":
+            message = self.ciechbuffer
+            self.ciechbuffer = ""
+            await msg.channel.send(message)
 
         if factoid_name not in self.factoids:
             if factoid_name in self.alias_map:
