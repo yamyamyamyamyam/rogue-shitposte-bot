@@ -33,7 +33,7 @@ Send this to ten other 🏈🐐⚡️Tiny lovers⚡️🐐🏈 who will never tr
 Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden 
 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 will be in full bloom!!'''
     ciechbuffer = ""
-    timesincelastciech = datetime.now()
+    lastciechdump = datetime.now()
 
     def __init__(self, bot, config):
         self.bot = bot
@@ -172,9 +172,16 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
 
     @Cog.listener()
     async def on_message(self, msg: Message):
-        if msg.author.id == 334845971332595722 and msg.content.len <= 75:
-            await msg.delete(delay=0.0)
-            self.ciechbuffer += msg.content + "\n"
+        #timesincelastciech = datetime.now() - self.lastciechdump
+        if msg.author.id == 1059641223603826798:
+            return
+
+        #if msg.author.id == 334845971332595722:
+        #    if timesincelastciech.seconds < 5:
+        #        await msg.delete(delay=0.0)
+        #        self.ciechbuffer += msg.content #+ "\n"
+        #    else:
+        #        self.lastciechdump = datetime.now()
 
         if not msg.content or len(msg.content) < 2 or msg.content[0] != '!':
             return
@@ -187,13 +194,9 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
                 if self.factoids[factoid]["is_saund"] == True or 'saund' in self.factoids[factoid]['name']:
                     saunds.append(self.factoids[factoid]['name'])
             factoid_name = random.choice(saunds)
-
-        timesincelastciech = datetime.now() - self.lastciechdump
-
-        if timesincelastciech.seconds >= 30 and self.ciechbuffer != "":
-            message = self.ciechbuffer
-            self.ciechbuffer = ""
-            await msg.channel.send(message)
+        elif factoid_name == 'hello':
+            hellos = ['hello', 'hallo', 'sarthina', 'sarthe-aliens']
+            factoid_name = random.choice(hellos)
 
         if factoid_name not in self.factoids:
             if factoid_name in self.alias_map:
