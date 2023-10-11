@@ -507,11 +507,12 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
 
         factoid = self.factoids[_name]
         message = factoid["message"].replace('`', '\\`') if factoid["message"] else '<no message>'
-        embed = Embed(title=f'Factoid information: {_name}', description=f'```{message}```')
+        embed = Embed(title=f'entry information: {_name}', description=f'```{message}```')
         if factoid['aliases']:
             embed.add_field(name='Aliases', value=', '.join(factoid['aliases']))
         embed.add_field(name='Uses (since 2018-06-07)', value=str(factoid['uses']))
         embed.add_field(name='Is Embed', value=str(factoid['embed']))
+        embed.add_field(name="saund?", value=str(factoid['is_saund']))
         if factoid['image_url']:
             embed.add_field(name='Image URL', value=factoid['image_url'], inline=False)
         return await ctx.send(embed=embed)
