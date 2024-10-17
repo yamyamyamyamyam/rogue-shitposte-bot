@@ -194,6 +194,8 @@ Get 10 back: Your 🌹💦🌷🎋💐💦🌹🌷🎋💦💐 Tiny garden
                 if self.factoids[factoid]["is_saund"] == True or 'saund' in self.factoids[factoid]['name']:
                     saunds.append(self.factoids[factoid]['name'])
             factoid_name = random.choice(saunds)
+        elif factoid_name == 'random':
+            factoid_name = random.choice(self.factoids)
         elif factoid_name == 'hello':
             hellos = ['hello', 'hallo', 'sarthina', 'sarthe-aliens']
             factoid_name = random.choice(hellos)
